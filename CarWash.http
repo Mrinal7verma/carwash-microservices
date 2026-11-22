@@ -1,0 +1,247 @@
+### CarWash Microservices System - HTTP Requests via API Gateway (Port 5000)
+@gatewayUrl = http://localhost:5000
+
+### Environment Variables for Authentication Tokens
+@adminToken = your-admin-jwt-token-here
+@customerToken = your-customer-jwt-token-here
+@washerToken = your-washer-jwt-token-here
+
+### Resource Identifiers
+@carId = 1
+@washerId = 1
+@packageId = 1
+@bookingId = 1
+
+
+###############################################################################
+# 1. AUTH SERVICE (ADMIN AUTHENTICATION)
+###############################################################################
+
+### 1.1 Admin Login
+POST {{gatewayUrl}}/api/auth/admin/login
+Content-Type: application/json
+
+{
+  "email": "admin@carwash.com",
+  "password": "Admin@123"
+}
+
+
+###############################################################################
+# 2. CUSTOMER SERVICE (REGISTRATION, PROFILE, CAR MANAGEMENT)
+###############################################################################
+
+### 2.1 Register New Customer
+POST {{gatewayUrl}}/api/customers/register
+Content-Type: application/json
+
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john.doe@example.com",
+  "phone": "9876543210",
+  "password": "Password@123",
+  "address": "123 Elm Street",
+  "city": "Springfield"
+}
+
+### 2.2 Customer Login
+POST {{gatewayUrl}}/api/customers/login
+Content-Type: application/json
+
+{
+  "email": "john.doe@example.com",
+  "password": "Password@123"
+}
+
+### 2.3 Get Customer Profile (Customer Role)
+GET {{gatewayUrl}}/api/customers/profile
+Authorization: Bearer {{customerToken}}
+
+### 2.4 Delete Customer Profile (Customer Role)
+DELETE {{gatewayUrl}}/api/customers/profile
+Authorization: Bearer {{customerToken}}
+
+### 2.5 List All Customers (Admin Role)
+GET {{gatewayUrl}}/api/customers
+Authorization: Bearer {{adminToken}}
+
+### 2.6 Add Car for Customer (Customer Role)
+POST {{gatewayUrl}}/api/customers/cars
+Authorization: Bearer {{customerToken}}
+Content-Type: application/json
+
+{
+  "make": "Toyota",
+  "model": "Camry",
+  "registrationNo": "KA01AB1234"
+}
+
+### 2.7 List Customer Cars (Customer Role)
+GET {{gatewayUrl}}/api/customers/cars
+Authorization: Bearer {{customerToken}}
+
+### 2.8 Get Customer Car by ID (Customer Role)
+GET {{gatewayUrl}}/api/customers/cars/{{carId}}
+Authorization: Bearer {{customerToken}}
+
+### 2.9 Delete Customer Car (Customer Role)
+DELETE {{gatewayUrl}}/api/customers/cars/{{carId}}
+Authorization: Bearer {{customerToken}}
+
+
+###############################################################################
+# 3. WASHER SERVICE (REGISTRATION, AVAILABILITY, PROFILES)
+###############################################################################
+
+### 3.1 Register New Washer
+POST {{gatewayUrl}}/api/washers/register
+Content-Type: application/json
+
+{
+  "firstName": "Bob",
+  "lastName": "Washer",
+  "email": "bob.washer@example.com",
+  "phone": "9123456780",
+  "password": "Password@123"
+}
+
+### 3.2 Washer Login
+POST {{gatewayUrl}}/api/washers/login
+Content-Type: application/json
+
+{
+  "email": "bob.washer@example.com",
+  "password": "Password@123"
+}
+
+### 3.3 Get Washer Profile (Washer Role)
+GET {{gatewayUrl}}/api/washers/profile
+Authorization: Bearer {{washerToken}}
+
+### 3.4 Toggle Washer Availability (Washer Role)
+PUT {{gatewayUrl}}/api/washers/availability
+Authorization: Bearer {{washerToken}}
+Content-Type: application/json
+
+{
+  "isAvailable": true
+}
+
+### 3.5 List All Washers (Admin Role)
+GET {{gatewayUrl}}/api/washers
+Authorization: Bearer {{adminToken}}
+
+### 3.6 Delete Washer Profile by ID (Admin Role)
+DELETE {{gatewayUrl}}/api/washers/{{washerId}}
+Authorization: Bearer {{adminToken}}
+
+
+###############################################################################
+# 4. BOOKING SERVICE (PACKAGES, BOOKINGS, WASHER ACTIONS)
+###############################################################################
+
+### 4.1 Get Active Service Packages (Public)
+GET {{gatewayUrl}}/api/bookings/packages
+
+### 4.2 Create New Booking (Customer Role)
+POST {{gatewayUrl}}/api/bookings
+Authorization: Bearer {{customerToken}}
+Content-Type: application/json
+
+{
+  "packageId": 1,
+  "carId": 1,
+  "scheduledTime": "2026-12-01T10:00:00Z"
+}
+
+### 4.3 Get My Bookings (Customer Role)
+GET {{gatewayUrl}}/api/bookings/my
+Authorization: Bearer {{customerToken}}
+
+### 4.4 Cancel Booking (Customer Role)
+PUT {{gatewayUrl}}/api/bookings/{{bookingId}}/cancel
+Authorization: Bearer {{customerToken}}
+
+### 4.5 Get Pending Bookings for Washers (Washer Role)
+GET {{gatewayUrl}}/api/bookings/pending
+Authorization: Bearer {{washerToken}}
+
+### 4.6 Get Assigned Bookings for Washer (Washer Role)
+GET {{gatewayUrl}}/api/bookings/washer/my
+Authorization: Bearer {{washerToken}}
+
+### 4.7 Accept Booking (Washer Role)
+PUT {{gatewayUrl}}/api/bookings/{{bookingId}}/status
+Authorization: Bearer {{washerToken}}
+Content-Type: application/json
+
+{
+  "action": "Accepted"
+}
+
+### 4.8 Reject Booking (Washer Role)
+PUT {{gatewayUrl}}/api/bookings/{{bookingId}}/status
+Authorization: Bearer {{washerToken}}
+Content-Type: application/json
+
+{
+  "action": "Rejected"
+}
+
+### 4.9 Complete Booking (Washer Role)
+PUT {{gatewayUrl}}/api/bookings/{{bookingId}}/status
+Authorization: Bearer {{washerToken}}
+Content-Type: application/json
+
+{
+  "action": "Completed"
+}
+
+### 4.10 Admin: List All Packages Including Inactive (Admin Role)
+GET {{gatewayUrl}}/api/bookings/admin/packages
+Authorization: Bearer {{adminToken}}
+
+### 4.11 Admin: Create Service Package (Admin Role)
+POST {{gatewayUrl}}/api/bookings/admin/packages
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Express Quick Clean",
+  "description": "Fast exterior rinse and wheel polish",
+  "price": 199.00,
+  "estimatedDurationMinutes": 20,
+  "isActive": true
+}
+
+### 4.12 Admin: Update Service Package (Admin Role)
+PUT {{gatewayUrl}}/api/bookings/admin/packages/{{packageId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Basic Wash Premium",
+  "description": "Upgraded exterior hand wash and tire shine",
+  "price": 349.00,
+  "estimatedDurationMinutes": 35,
+  "isActive": true
+}
+
+### 4.13 Admin: Soft-Delete Package (Admin Role)
+DELETE {{gatewayUrl}}/api/bookings/admin/packages/{{packageId}}
+Authorization: Bearer {{adminToken}}
+
+
+###############################################################################
+# 5. GATEWAY BLOCKED INTERNAL ENDPOINTS (SECURITY VERIFICATION - EXPECTS 404)
+###############################################################################
+
+### 5.1 Internal Active Customer Check (Should return 404 Not Found from Gateway)
+GET {{gatewayUrl}}/api/bookings/internal/customers/1/active
+
+### 5.2 Internal Customer Lookup (Should return 404 Not Found from Gateway)
+GET {{gatewayUrl}}/api/customers/internal/1
+
+### 5.3 Internal Washer Lookup (Should return 404 Not Found from Gateway)
+GET {{gatewayUrl}}/api/washers/internal/1

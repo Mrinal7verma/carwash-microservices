@@ -1,0 +1,16 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <NoWarn>$(NoWarn);CS1591;SA0001;SA1600;SA1633;SA1101;SA1200;SA1309;SA1402;SA1413;NU1901;NU1902;NU1903;NU1904</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" PrivateAssets="all" Condition="'$(MSBuildProjectExtension)' == '.csproj'" />
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0" PrivateAssets="all" Condition="'$(MSBuildProjectExtension)' == '.csproj'" />
+  </ItemGroup>
+</Project>
